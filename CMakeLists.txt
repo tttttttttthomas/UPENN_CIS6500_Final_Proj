@@ -48,15 +48,11 @@ endif()
 
 # Source files
 set(SOURCES
-    src/data/data_point.cpp
-    src/data/data_loader.cpp
     src/indexes/base_index.cpp
-    # src/indexes/rtree_index.cpp  # TODO: Fix Boost compatibility issue
+    src/indexes/rtree_index.cpp
     src/indexes/kdtree_index.cpp
     src/indexes/zorder_index.cpp
     src/indexes/flood_index.cpp
-    src/benchmark/workload_generator.cpp
-    src/benchmark/benchmark.cpp
 )
 
 # Create library
@@ -66,6 +62,10 @@ target_include_directories(flood_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
 # Main executable
 add_executable(flood_index src/main.cpp)
 target_link_libraries(flood_index flood_lib ${Boost_LIBRARIES})
+
+# Simple test executable
+add_executable(simple_test tests/simple_test.cpp)
+target_link_libraries(simple_test flood_lib ${Boost_LIBRARIES})
 
 # Benchmark executable
 add_executable(run_benchmark src/benchmark/run_benchmark.cpp)

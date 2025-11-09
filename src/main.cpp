@@ -1,73 +1,81 @@
-#include "data/data_point.h"
-#include "data/data_loader.h"
 #include <iostream>
 #include <vector>
+#include <memory>
+#include "data/data_point.h"
+#include "indexes/kdtree_index.h"
+#include "indexes/zorder_index.h"
+#include "indexes/rtree_index.h"
 
 using namespace flood;
 
-int main(int argc, char* argv[]) {
-    std::cout << "========================================" << std::endl;
-    std::cout << "  Flood Learning Index - Test Program  " << std::endl;
-    std::cout << "========================================" << std::endl;
+int main() {
+    std::cout << "=== Flood Index Project - Baseline Index Test ===" << std::endl;
     std::cout << std::endl;
     
-    // Test 1: Create some sample data points
-    std::cout << "Test 1: Creating sample data points..." << std::endl;
-    std::vector<DataPoint> sample_data;
+    // Create sample 2D data points
+    std::vector<DataPoint> data;
+    std::cout << "Creating sample data (1000 points in 2D)..." << std::endl;
     
-    for (int i = 0; i < 10; ++i) {
+    for (size_t i = 0; i < 1000; ++i) {
         std::vector<double> coords = {
-            -74.0 + i * 0.01,  // longitude
-            40.7 + i * 0.01,   // latitude
-            static_cast<double>(i)  // some other dimension
+            (double)(i % 100),           // x: 0-99
+            (double)(i / 100)            // y: 0-9
         };
-        sample_data.emplace_back(coords, i);
+        data.emplace_back(coords, i);
     }
     
-    std::cout << "Created " << sample_data.size() << " sample points" << std::endl;
-    std::cout << "First point: " << sample_data[0].toString() << std::endl;
-    std::cout << "Last point: " << sample_data.back().toString() << std::endl;
+    std::cout << "Sample data created: " << data.size() << " points" << std::endl;
     std::cout << std::endl;
     
-    // Test 2: Test query range
-    std::cout << "Test 2: Testing query range..." << std::endl;
-    std::vector<double> min_bounds = {-74.05, 40.70, 0.0};
-    std::vector<double> max_bounds = {-73.95, 40.80, 5.0};
-    QueryRange range(min_bounds, max_bounds);
+    // Define a query range: [10, 20] x [2, 5]
+    std::vector<double> min_bounds = {10.0, 2.0};
+    std::vector<double> max_bounds = {20.0, 5.0};
+    QueryRange query(min_bounds, max_bounds);
     
-    std::cout << "Query range: " << range.toString() << std::endl;
-    std::cout << "Range volume: " << range.getVolume() << std::endl;
+    std::cout << "Query range: [" << min_bounds[0] << ", " << max_bounds[0] 
+              << "] x [" << min_bounds[1] << ", " << max_bounds[1] << "]" << std::endl;
+    std::cout << std::endl;
     
-    int count = 0;
-    for (const auto& point : sample_data) {
-        if (range.contains(point)) {
-            count++;
-        }
+    // Test k-d Tree
+    {
+        std::cout << "--- Testing k-d Tree ---" << std::endl;
+        KDTreeIndex kdtree;
+        kdtree.build(data);
+        
+        auto results = kdtree.query(query);
+        std::cout << "Query results: " << results.size() << " points" << std::endl;
+        std::cout << "Index size: " << kdtree.getIndexSize() << " MB" << std::endl;
+        std::cout << "Build time: " << kdtree.getBuildTime() << " ms" << std::endl;
+        std::cout << std::endl;
     }
-    std::cout << "Points within range: " << count << " / " << sample_data.size() << std::endl;
-    std::cout << std::endl;
     
-    // Test 3: Test DataLoader
-    std::cout << "Test 3: Testing DataLoader..." << std::endl;
-    DataLoader loader;
+    // Test Z-order
+    {
+        std::cout << "--- Testing Z-order Index ---" << std::endl;
+        ZOrderIndex zorder;
+        zorder.build(data);
+        
+        auto results = zorder.query(query);
+        std::cout << "Query results: " << results.size() << " points" << std::endl;
+        std::cout << "Index size: " << zorder.getIndexSize() << " MB" << std::endl;
+        std::cout << "Build time: " << zorder.getBuildTime() << " ms" << std::endl;
+        std::cout << std::endl;
+    }
     
-    // Save sample data to binary file
-    std::string binary_file = "/tmp/test_data.bin";
-    loader.saveToBinary(sample_data, binary_file);
+    // Test R*-tree
+    {
+        std::cout << "--- Testing R*-tree Index ---" << std::endl;
+        RTreeIndex rtree;
+        rtree.build(data);
+        
+        auto results = rtree.query(query);
+        std::cout << "Query results: " << results.size() << " points" << std::endl;
+        std::cout << "Index size: " << rtree.getIndexSize() << " MB" << std::endl;
+        std::cout << "Build time: " << rtree.getBuildTime() << " ms" << std::endl;
+        std::cout << std::endl;
+    }
     
-    // Load it back
-    auto loaded_data = loader.loadFromBinary(binary_file);
-    std::cout << "Loaded " << loaded_data.size() << " points from binary file" << std::endl;
-    
-    // Compute statistics
-    auto stats = loader.computeStats(loaded_data);
-    stats.print();
-    std::cout << std::endl;
-    
-    std::cout << "========================================" << std::endl;
-    std::cout << "  All tests completed successfully!    " << std::endl;
-    std::cout << "========================================" << std::endl;
+    std::cout << "=== All tests completed successfully! ===" << std::endl;
     
     return 0;
 }
-

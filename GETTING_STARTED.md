@@ -56,8 +56,23 @@ cd "/Users/wangkaiyuan/Desktop/UPenn/Fall 2025/CIS 6500/final project"
 mkdir -p data/nyc_taxi
 
 # 访问 https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
-# 下载2024年1月的数据（推荐从一个月开始）
-# 将文件放在 data/nyc_taxi/ 目录下
+# 下载数据（推荐从一个月开始）
+# 
+# 推荐下载：
+# - 数据类型：Yellow Taxi Trip Records（数据量最大，最适合测试）
+# - 格式：CSV格式（项目目前只支持CSV）
+# - 月份：2025年1月（或任意一个月）
+# - 将文件放在 data/nyc_taxi/ 目录下
+```
+
+**注意：** 
+- 如果网站只有PARQUET格式，可以使用提供的转换脚本：
+```bash
+# 安装依赖
+pip install pandas pyarrow
+
+# 转换PARQUET到CSV
+python tools/convert_parquet_to_csv.py data/nyc_taxi/yellow_tripdata_2025-01.parquet data/nyc_taxi/input.csv
 ```
 
 ### 3. 处理数据

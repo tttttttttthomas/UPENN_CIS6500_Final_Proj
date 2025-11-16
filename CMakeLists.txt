@@ -53,6 +53,8 @@ set(SOURCES
     src/indexes/kdtree_index.cpp
     src/indexes/zorder_index.cpp
     src/indexes/flood_index.cpp
+    src/benchmark/workload_generator.cpp
+    src/benchmark/benchmark.cpp
 )
 
 # Create library

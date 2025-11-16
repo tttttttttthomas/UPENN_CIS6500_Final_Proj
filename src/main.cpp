@@ -5,11 +5,12 @@
 #include "indexes/kdtree_index.h"
 #include "indexes/zorder_index.h"
 #include "indexes/rtree_index.h"
+#include "indexes/flood_index.h"
 
 using namespace flood;
 
 int main() {
-    std::cout << "=== Flood Index Project - Baseline Index Test ===" << std::endl;
+    std::cout << "=== Flood Index Project - Full Index Test ===" << std::endl;
     std::cout << std::endl;
     
     // Create sample 2D data points
@@ -72,6 +73,19 @@ int main() {
         std::cout << "Query results: " << results.size() << " points" << std::endl;
         std::cout << "Index size: " << rtree.getIndexSize() << " MB" << std::endl;
         std::cout << "Build time: " << rtree.getBuildTime() << " ms" << std::endl;
+        std::cout << std::endl;
+    }
+    
+    // Test Flood (Learning Index)
+    {
+        std::cout << "--- Testing Flood Index (Learning) ---" << std::endl;
+        FloodIndex flood;
+        flood.build(data);
+        
+        auto results = flood.query(query);
+        std::cout << "Query results: " << results.size() << " points" << std::endl;
+        std::cout << "Index size: " << flood.getIndexSize() << " MB" << std::endl;
+        std::cout << "Build time: " << flood.getBuildTime() << " ms" << std::endl;
         std::cout << std::endl;
     }
     

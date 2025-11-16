@@ -6,6 +6,7 @@
 #include "indexes/kdtree_index.h"
 #include "indexes/zorder_index.h"
 #include "indexes/rtree_index.h"
+#include "indexes/flood_index.h"
 
 using namespace flood;
 
@@ -68,6 +69,20 @@ void test_correctness() {
         auto results = rtree.query(query);
         
         std::cout << "R*-tree: " << results.size() << " points";
+        if (results.size() == 20) {
+            std::cout << " ✓" << std::endl;
+        } else {
+            std::cout << " ✗ (expected 20)" << std::endl;
+        }
+    }
+    
+    // Test Flood
+    {
+        FloodIndex flood;
+        flood.build(data);
+        auto results = flood.query(query);
+        
+        std::cout << "Flood:   " << results.size() << " points";
         if (results.size() == 20) {
             std::cout << " ✓" << std::endl;
         } else {
@@ -138,6 +153,19 @@ void test_performance() {
         std::cout << "R*-tree:" << std::endl;
         std::cout << "  Build time: " << rtree.getBuildTime() << " ms" << std::endl;
         std::cout << "  Index size: " << rtree.getIndexSize() << " MB" << std::endl;
+        std::cout << "  Query results: " << results.size() << " points" << std::endl;
+        std::cout << std::endl;
+    }
+    
+    // Test Flood
+    {
+        FloodIndex flood;
+        flood.build(data);
+        auto results = flood.query(query);
+        
+        std::cout << "Flood:" << std::endl;
+        std::cout << "  Build time: " << flood.getBuildTime() << " ms" << std::endl;
+        std::cout << "  Index size: " << flood.getIndexSize() << " MB" << std::endl;
         std::cout << "  Query results: " << results.size() << " points" << std::endl;
         std::cout << std::endl;
     }
